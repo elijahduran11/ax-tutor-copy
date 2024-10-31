@@ -1,5 +1,5 @@
 # This image is still very much a work in progress. It was tested on Linux and allows
-# to run tutor from inside docker. In practice, all "tutor" commands should be replaced # by:
+# to run tutor from inside docker. In practice, all "tutor" commands should be replaced by:
 #
 #     docker run --rm -it -P \
 #        -v /var/run/docker.sock:/var/run/docker.sock \
@@ -10,7 +10,8 @@
 # Because this image is still experimental, and we are not quite sure if it's going to 
 # be very useful, we do not provide any usage documentation.
 
-FROM docker.io/python:3.8-slim-stretch
+# Update this line
+FROM docker.io/python:3.8-slim
 
 # As per https://github.com/docker/compose/issues/3918
 COPY --from=library/docker:19.03 /usr/local/bin/docker /usr/bin/docker
