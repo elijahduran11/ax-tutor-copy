@@ -13,7 +13,6 @@
 # Update this line
 FROM docker.io/python:3.8-slim
 
-# As per https://github.com/docker/compose/issues/3918
 COPY --from=library/docker:19.03 /usr/local/bin/docker /usr/bin/docker
 COPY --from=docker/compose:1.24.0 /usr/local/bin/docker-compose /usr/bin/docker-compose
 
@@ -25,3 +24,5 @@ EXPOSE 80
 EXPOSE 443
 
 ENTRYPOINT ["tutor"]
+CMD ["local", "quickstart"]
+
