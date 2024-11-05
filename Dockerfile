@@ -12,26 +12,39 @@
 
 # Update this line
 # Base image
+# Base image
 FROM python:3.8-slim
 
 # Install Docker CLI and Docker Compose
 COPY --from=library/docker:19.03 /usr/local/bin/docker /usr/bin/docker
 COPY --from=docker/compose:1.24.0 /usr/local/bin/docker-compose /usr/bin/docker-compose
 
-# Install Tutor and required plugins
-RUN pip install tutor \
-    && tutor plugins update \
-    && tutor plugins install indigo mfe \
-    && tutor plugins enable indigo mfe
+# Install necessary system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set up environment
-RUN mkdir /opt/tutor
-ENV TUTOR_ROOT=/opt/tutor
+# Create a non-root user
+RUN useradd -ms /bin/bash tutoruser
+USER tutoruser
+WORKDIR /home/tutoruser
+
+# Install Tutor
+RUN pip install --user tutor
+
+# Configure Tutor
+RUN ~/.local/bin/tutor config save --noninteractive
+
+# Update and install plugins
+RUN ~/.local/bin/tutor plugins update \
+    && ~/.local/bin/tutor plugins install indigo mfe \
+    && ~/.local/bin/tutor plugins enable indigo mfe
 
 # Expose necessary ports
 EXPOSE 80 443
 
-# Set entrypoint and default command
-ENTRYPOINT ["tutor"]
-CMD ["local", "quickstart"]
+# Entry point and default command
+ENTRYPOINT ["~/.local/bin/tutor"]
+CMD ["local", "launch"]
+
 
