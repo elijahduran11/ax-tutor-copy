@@ -11,39 +11,27 @@
 # be very useful, we do not provide any usage documentation.
 
 # Update this line
-# Use a slim Python image as the base
-FROM docker.io/python:3.8-slim
+# Base image
+FROM python:3.8-slim
 
-# Copy Docker and Docker Compose binaries
+# Install Docker CLI and Docker Compose
 COPY --from=library/docker:19.03 /usr/local/bin/docker /usr/bin/docker
 COPY --from=docker/compose:1.24.0 /usr/local/bin/docker-compose /usr/bin/docker-compose
 
-# Install Tutor
-RUN pip install tutor
+# Install Tutor and required plugins
+RUN pip install tutor \
+    && tutor plugins update \
+    && tutor plugins install indigo mfe \
+    && tutor plugins enable indigo mfe
 
-# Create the Tutor root directory and set environment variable
+# Set up environment
 RUN mkdir /opt/tutor
 ENV TUTOR_ROOT=/opt/tutor
 
-# Run tutor as a non-root user
-RUN useradd -m tutoruser
-USER tutoruser
-WORKDIR /home/tutoruser
+# Expose necessary ports
+EXPOSE 80 443
 
-# Update plugin index and install plugins
-RUN tutor plugins update && \
-    tutor plugins install indigo && tutor plugins enable indigo && \
-    tutor plugins install mfe && tutor plugins enable mfe
-
-# Expose HTTP and HTTPS ports
-EXPOSE 80
-EXPOSE 443
-
-# Set the entry point to Tutor
+# Set entrypoint and default command
 ENTRYPOINT ["tutor"]
-
-# Default command to start the container
-CMD ["local", "quickstart"]
-
 CMD ["local", "quickstart"]
 
