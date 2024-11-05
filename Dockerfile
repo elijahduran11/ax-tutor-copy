@@ -21,13 +21,19 @@ COPY --from=docker/compose:1.24.0 /usr/local/bin/docker-compose /usr/bin/docker-
 # Install Tutor
 RUN pip install tutor
 
-# Create the Tutor root directory
+# Create the Tutor root directory and set environment variable
 RUN mkdir /opt/tutor
 ENV TUTOR_ROOT=/opt/tutor
 
-# Install necessary plugins (indigo and mfe in this case)
-RUN tutor plugins install indigo && tutor plugins enable indigo
-RUN tutor plugins install mfe && tutor plugins enable mfe
+# Run tutor as a non-root user
+RUN useradd -m tutoruser
+USER tutoruser
+WORKDIR /home/tutoruser
+
+# Update plugin index and install plugins
+RUN tutor plugins update && \
+    tutor plugins install indigo && tutor plugins enable indigo && \
+    tutor plugins install mfe && tutor plugins enable mfe
 
 # Expose HTTP and HTTPS ports
 EXPOSE 80
@@ -37,5 +43,7 @@ EXPOSE 443
 ENTRYPOINT ["tutor"]
 
 # Default command to start the container
+CMD ["local", "quickstart"]
+
 CMD ["local", "quickstart"]
 
