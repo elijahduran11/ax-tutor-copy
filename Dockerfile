@@ -14,6 +14,10 @@
 # Base image
 FROM docker.io/python:3.8-slim
 
+# Create a non-root user
+RUN useradd -m tutoruser
+USER tutoruser
+
 # Set up the Tutor directory
 RUN mkdir /opt/tutor
 ENV TUTOR_ROOT=/opt/tutor
@@ -24,7 +28,7 @@ RUN pip install --upgrade pip \
     && tutor plugins update \
     && tutor plugins install indigo mfe \
     && tutor plugins enable indigo mfe \
-    && tutor config save --noninteractive  # Ensure no interactive config prompts
+    && tutor local launch || true  # Ensure Tutor project root is initialized
 
 # Expose necessary ports
 EXPOSE 80
@@ -33,5 +37,6 @@ EXPOSE 443
 # Set default entrypoint and command for Tutor
 ENTRYPOINT ["tutor"]
 CMD ["local", "launch"]
+
 
 
