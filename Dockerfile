@@ -16,10 +16,15 @@ FROM docker.io/python:3.8-slim
 
 # Create a non-root user
 RUN useradd -m tutoruser
+
+# Switch to root for creating the directory in /opt
+USER root
+RUN mkdir -p /opt/tutor
+
+# Switch back to non-root user
 USER tutoruser
 
 # Set up the Tutor directory
-RUN mkdir /opt/tutor
 ENV TUTOR_ROOT=/opt/tutor
 
 # Install Tutor, upgrade pip, and install plugins in a single step
@@ -37,6 +42,7 @@ EXPOSE 443
 # Set default entrypoint and command for Tutor
 ENTRYPOINT ["tutor"]
 CMD ["local", "launch"]
+
 
 
 
