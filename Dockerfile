@@ -36,7 +36,7 @@ RUN pip install --upgrade pip \
     && tutor local launch || true  # Ensure Tutor project root is initialized
 
 # Expose necessary ports
-EXPOSE 8080
+EXPOSE 80
 EXPOSE 443
 
 # Set default entrypoint and command for Tutor
